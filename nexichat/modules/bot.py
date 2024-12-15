@@ -1,34 +1,42 @@
+import requests
+from MukeshAPI import api
+from pyrogram import filters, Client
+from pyrogram.enums import ChatAction
+from nexichat import nexichat as app
 
-TOKEN = "7773367621:AAFAHG-Nqa-gDqogKYbqzv1f5yhUu8-v8j8"
-API_KEY = "AIzaSyB-063TPUjVTabNEQPRLhEIdEu_xtixUvk"
 
-# Configure the generative model
-genai.configure(api_key=API_KEY)
-model = genai.GenerativeModel('gemini-1.5-flash')
+@Client.on_message(filters.command(["gemini", "ai", "ask", "chatgpt"]))
+async def gemini_handler(client, message):
+    if (
+        message.text.startswith(f"/gemini@{client.me.username}")
+        and len(message.text.split(" ", 1)) > 1
+    ):
+        user_input = message.text.split(" ", 1)[1]
+    elif message.reply_to_message and message.reply_to_message.text:
+        user_input = message.reply_to_message.text
+    else:
+        if len(message.command) > 1:
+            user_input = " ".join(message.command[1:])
+        else:
+            await message.reply_text("ᴇxᴀᴍᴘʟᴇ :- `/ask who is Narendra Modi`")
+            return
 
-def generate_content(full_prompt: str) -> str:
     try:
-        response = model.generate_content(full_prompt)
-        return response.text if hasattr(response, 'text') else "Sorry, I couldn't generate a response."
-    except Exception as e:
-        return f"There was an error generating the response: {str(e)}"
+        response = api.gemini(user_input)
+        await client.send_chat_action(message.chat.id, ChatAction.TYPING)
+        result = response.get("results")
+        if result:
+            await message.reply_text(result, quote=True)
+            return
+    except:
+        pass  
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    user_id = update.effective_user.first_name
-    system_message = f"Hello {user_id}! I am a chatbot. How can I help you today?"
-    await update.message.reply_text(system_message)
-
-async def chat(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    user_message = update.message.text
-    response_text = generate_content(user_message)
-    await update.message.reply_text(response_text)
-
-# Build the application
-app = ApplicationBuilder().token(TOKEN).build()
-
-# Add handlers
-app.add_handler(CommandHandler("start", start))
-app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, chat))
-
-# Run the bot
-app.run_polling()
+    try:
+        base_url = "https://chatwithai.codesearch.workers.dev/?chat="
+        response = requests.get(base_url + user_input)
+        if response and response.text.strip():
+            await message.reply_text(response.text.strip(), quote=True)
+        else:
+            await message.reply_text("**Both Gemini and Chat with AI are currently unavailable**")
+    except:
+        await message.reply_text("**Chatgpt is currently dead. Try again later.**")
