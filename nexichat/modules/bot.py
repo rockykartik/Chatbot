@@ -1,4 +1,4 @@
-from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
+from pyrogram.types import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
 import google.generativeai as genai
 
 TOKEN = "7773367621:AAFAHG-Nqa-gDqogKYbqzv1f5yhUu8-v8j8"
