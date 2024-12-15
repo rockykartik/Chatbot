@@ -1,4 +1,3 @@
-import google.generativeai as genai
 
 TOKEN = "7773367621:AAFAHG-Nqa-gDqogKYbqzv1f5yhUu8-v8j8"
 API_KEY = "AIzaSyB-063TPUjVTabNEQPRLhEIdEu_xtixUvk"
