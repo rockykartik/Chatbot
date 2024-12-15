@@ -5,7 +5,7 @@ from pyrogram.enums import ChatAction
 from nexichat import nexichat as app
 
 
-async def gemini_handler(client, message):
+async def save_reply(original_message: Message, reply_message: Message):
     if (
         message.text.startswith(f"/gemini@{client.me.username}")
         and len(message.text.split(" ", 1)) > 1
